@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import { Auth, GoogleAuthProvider, signInWithPopup } from '@firebase/auth';
 
@@ -9,10 +9,9 @@ type LoginProps = {
 const Login: React.FC<LoginProps> = ({ auth }) => {
   const provider = new GoogleAuthProvider();
 
-  const signIn = async () => {
-    const result = await signInWithPopup(auth, provider);
-    console.log(result.user);
-  };
+  const signIn = useCallback(async () => {
+    await signInWithPopup(auth, provider);
+  }, [auth, provider]);
 
   return (
     <>
