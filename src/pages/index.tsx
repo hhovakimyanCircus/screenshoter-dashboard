@@ -1,5 +1,7 @@
 import Head from 'next/head';
 
+import GoogleAuth from '@/components/GoogleAuth';
+
 export default function Home() {
   return (
     <>
@@ -10,7 +12,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <h1 className="text-3xl font-bold text-center">Welcome</h1>
+        <div className="flex flex-col gap-4 items-center p-4">
+          <h1 className="text-3xl font-bold text-center">
+            Welcome to My Screenshot dashboard
+          </h1>
+          <GoogleAuth />
+        </div>
       </main>
     </>
   );

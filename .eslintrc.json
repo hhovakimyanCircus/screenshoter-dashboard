@@ -16,7 +16,8 @@
         "trailingComma": "all",
         "arrowParens": "avoid"
       }
-    ]
+    ],
+    "import/extensions": 0
   },
   "overrides": [
     {
