@@ -16,8 +16,7 @@
         "trailingComma": "all",
         "arrowParens": "avoid"
       }
-    ],
-    "import/extensions": 0
+    ]
   },
   "overrides": [
     {
@@ -71,7 +70,9 @@
         "tailwindcss/no-custom-classname": "off", // Disabled otherwise nightmare to allow each custom tailwind classes
         "@typescript-eslint/no-unused-vars": "off",
         "unused-imports/no-unused-imports": "error",
-        "unused-imports/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+        "unused-imports/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+        "import/extensions": 0,
+        "import/no-extraneous-dependencies": "off"
       }
     }
   ]
