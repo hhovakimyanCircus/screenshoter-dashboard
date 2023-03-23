@@ -10,7 +10,17 @@ const Login: React.FC<LoginProps> = ({ auth }) => {
   const provider = new GoogleAuthProvider();
 
   const signIn = useCallback(async () => {
-    await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider);
+    // @ts-ignore
+    const accessToken = result?.user?.accessToken;
+    const userId = result?.user?.uid;
+    if (chrome.runtime && userId && accessToken) {
+      chrome.runtime.sendMessage(process.env.NEXT_PUBLIC_EXTENSION_ID, {
+        event: 'LOGIN',
+        userId,
+        accessToken,
+      });
+    }
   }, [auth, provider]);
 
   return (
