@@ -12,13 +12,14 @@ const Login: React.FC<LoginProps> = ({ auth }) => {
   const signIn = useCallback(async () => {
     const result = await signInWithPopup(auth, provider);
     // @ts-ignore
-    const accessToken = result?.user?.accessToken;
+    const refreshToken = result?.user?.stsTokenManager?.refreshToken;
     const userId = result?.user?.uid;
-    if (chrome.runtime && userId && accessToken) {
+
+    if (chrome.runtime && userId && refreshToken) {
       chrome.runtime.sendMessage(process.env.NEXT_PUBLIC_EXTENSION_ID, {
         event: 'LOGIN',
         userId,
-        accessToken,
+        refreshToken,
       });
     }
   }, [auth, provider]);
