@@ -15,8 +15,6 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
 
   const [recordings, setRecordings] = useState<Recording[]>([]);
 
-  console.log(recordings);
-
   useEffect(() => {
     // Get fresh id token
     if (user && sessionId) {
@@ -39,10 +37,7 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
               };
             });
             setRecordings((prev) => {
-              return {
-                ...prev,
-                ...newRecordings,
-              };
+              return [...prev, ...newRecordings];
             });
           });
       });
@@ -53,7 +48,51 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
     return <></>;
   }
 
-  return <></>;
+  return (
+    <div className="flex flex-col mb-10">
+      {recordings.map((recording, index) => {
+        let recordingLink = <></>;
+        if (
+          index === 0 ||
+          recordings[index].url !== recordings[index - 1].url
+        ) {
+          recordingLink = (
+            <div
+              className="py-5 px-20 mt-10 w-full bg-white rounded-lg border"
+              key={`recording-${recording.id}`}
+            >
+              <div className="text-lg text-neutral-700">
+                Navigate to{' '}
+                <a
+                  href={recording.url}
+                  target="_blank"
+                  className="text-blue-500"
+                >
+                  {recording.url}
+                </a>
+              </div>
+            </div>
+          );
+        }
+
+        const recordingStep = (
+          <div className="py-10 px-20 mt-10 w-full bg-white rounded-lg border">
+            <div className="mb-4 text-lg text-neutral-700">
+              {recording.clickedElementName}
+            </div>
+            <img src={recording.image} alt="" className="w-full" />
+          </div>
+        );
+
+        return (
+          <React.Fragment key={`recording-${recording.id}`}>
+            {recordingLink}
+            {recordingStep}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
 };
 
 export default Recordings;
