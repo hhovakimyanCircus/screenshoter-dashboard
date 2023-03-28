@@ -15,6 +15,8 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
 
   const [recordings, setRecordings] = useState<Recording[]>([]);
 
+  console.log(recordings);
+
   useEffect(() => {
     // Get fresh id token
     if (user && sessionId) {
