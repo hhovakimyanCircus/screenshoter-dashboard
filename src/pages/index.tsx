@@ -15,7 +15,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <main className="h-screen bg-gray-100">
+      <main className="h-screen bg-slate-50">
         <div className="flex flex-col gap-4 items-center px-10 pt-20">
           <h1 className="text-3xl font-bold text-center">
             Welcome to My Screenshot dashboard
