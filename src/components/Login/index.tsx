@@ -25,17 +25,12 @@ const Login: React.FC<LoginProps> = ({ auth }) => {
   }, [auth, provider]);
 
   return (
-    <>
-      <h2 className="text-xl font-bold text-center">
-        Sign In to Use The Extension
-      </h2>
-      <a
-        onClick={signIn}
-        className="p-2 w-48 text-center text-white bg-blue-600 rounded-md cursor-pointer"
-      >
-        Sign In/Up with Google
-      </a>
-    </>
+    <a
+      onClick={signIn}
+      className="p-2 w-48 text-center text-white bg-blue-500 rounded cursor-pointer"
+    >
+      Sign In/Up with Google
+    </a>
   );
 };
 
