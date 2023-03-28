@@ -19,7 +19,7 @@ const Logout: React.FC<LogoutProps> = ({ auth }) => {
   return (
     <a
       onClick={signOut}
-      className="p-2 w-48 text-center text-white bg-blue-600 rounded-md cursor-pointer"
+      className="p-2 w-28 text-base text-center text-white bg-blue-500 rounded cursor-pointer"
     >
       Sign Out
     </a>
