@@ -4,7 +4,7 @@ import GoogleAuth from '@/components/GoogleAuth';
 
 const Header = () => {
   return (
-    <header className="py-4 px-6 w-screen bg-white border-b">
+    <header className="fixed top-0 z-30 py-4 px-6 w-screen bg-white border-b">
       <div className="flex justify-between items-center px-4">
         <div>
           <Link href="/" className="font-mono text-xl">
