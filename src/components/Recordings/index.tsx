@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { getAuth } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
+import Loading from '@/components/Loading';
 import { Recording, RecordingFirebaseResponse } from '@/types';
 
 type RecordingsProps = {
@@ -14,6 +15,7 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
   const [user, loading] = useAuthState(auth);
 
   const [recordings, setRecordings] = useState<Recording[]>([]);
+  const [isLoadingRecordings, setIsLoadingRecordings] = useState<boolean>(true);
 
   useEffect(() => {
     // Get fresh id token
@@ -36,6 +38,7 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
                 ...result[recordingKey],
               };
             });
+            setIsLoadingRecordings(false);
             setRecordings((prev) => {
               return [...prev, ...newRecordings];
             });
@@ -44,8 +47,13 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
     }
   }, [user, sessionId]);
 
-  if (loading) {
-    return <></>;
+  if (loading || isLoadingRecordings) {
+    return (
+      <Loading
+        wrapperClassName="flex flex-col items-center h-[calc(100vh-72px)] justify-center"
+        iconClassName="w-20 h-20 fill-blue-500"
+      />
+    );
   }
 
   return (
