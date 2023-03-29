@@ -47,12 +47,22 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
     }
   }, [user, sessionId]);
 
-  if (loading || isLoadingRecordings) {
+  if (loading || (user && isLoadingRecordings)) {
     return (
       <Loading
         wrapperClassName="flex flex-col items-center h-[calc(100vh-72px)] justify-center"
         iconClassName="w-20 h-20 fill-blue-500"
       />
+    );
+  }
+
+  if (!loading && !user) {
+    return (
+      <div className="pt-20 h-[calc(100vh-72px)] text-center">
+        <span className="text-2xl text-gray-600">
+          Please authenticate to continue . . .
+        </span>
+      </div>
     );
   }
 
