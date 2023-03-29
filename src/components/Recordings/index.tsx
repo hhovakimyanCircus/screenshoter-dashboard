@@ -169,6 +169,17 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
     );
   }
 
+  if (!isLoadingRecordings && recordings.length === 0) {
+    return (
+      <div className="pt-20 h-[calc(100vh-72px)] text-center">
+        <span className="text-2xl text-gray-600">
+          Nothing found for this specific session. Please try visiting this page
+          later . . .
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col mb-10">
       {recordings.map((recording, index) => {
