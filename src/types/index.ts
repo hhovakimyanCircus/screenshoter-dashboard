@@ -1,15 +1,14 @@
 export type FirebaseRecording = {
-  sessionId: string;
   clickedElementName: string;
   image: string;
-  date: string;
+  timestamp: number;
   url: string;
 };
 
 export type Recording = {
   clickedElementName: string;
   image: string;
-  date: string;
+  timestamp: number;
   url: string;
   id: string;
 };

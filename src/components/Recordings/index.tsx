@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { getAuth } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -10,44 +10,147 @@ type RecordingsProps = {
   sessionId: string;
 };
 
+const fetchRecordings = (
+  userId: string,
+  token: string,
+  sessionId: string,
+  limit: number,
+  successCallback: (result: RecordingFirebaseResponse | null) => void,
+  lastTimestamp?: number
+) => {
+  const queryParams: { [key: string]: string | number } = {
+    auth: token,
+    orderBy: '"timestamp"',
+    limitToFirst: limit,
+  };
+  if (lastTimestamp) {
+    queryParams.startAt = lastTimestamp + 1;
+  }
+
+  const queryString = Object.keys(queryParams)
+    .map(
+      (k) => `${encodeURIComponent(k)}=${encodeURIComponent(queryParams[k])}`
+    )
+    .join('&');
+
+  fetch(
+    `${process.env.NEXT_PUBLIC_DATABASE_URL}/users/${userId}/${sessionId}/.json?${queryString}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+    .then((response) => response.json())
+    .then((result: RecordingFirebaseResponse | null) => {
+      successCallback(result);
+    });
+};
+
 const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
   const auth = getAuth();
   const [user, loading] = useAuthState(auth);
 
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [isLoadingRecordings, setIsLoadingRecordings] = useState<boolean>(true);
+  const [idToken, setIdToken] = useState<string>('');
+  const [lastId, setLastId] = useState<string>('');
+  const [lastTimestamp, setLastTimestamp] = useState<number>(0);
+  const [scrollPosition, setScrollPosition] = useState<number>(0);
+  const [allRecordingsLoaded, setAllRecordingsLoaded] =
+    useState<boolean>(false);
+  const recordingsLimit = 2;
+
+  const onRecordingsLoaded = useCallback(
+    (result: RecordingFirebaseResponse | null) => {
+      if (result) {
+        const newRecordings = Object.keys(result).map((recordingKey) => {
+          return {
+            id: recordingKey,
+            ...result[recordingKey],
+          };
+        });
+        setRecordings((prev) => {
+          return [...prev, ...newRecordings];
+        });
+        setLastId(newRecordings[newRecordings.length - 1].id);
+        setLastTimestamp(newRecordings[newRecordings.length - 1].timestamp);
+      }
+
+      setIsLoadingRecordings(false);
+    },
+    []
+  );
+
+  const loadNewRecordings = useCallback(() => {
+    setIsLoadingRecordings(true);
+    fetchRecordings(
+      user?.uid as string,
+      idToken,
+      sessionId,
+      recordingsLimit,
+      (result: RecordingFirebaseResponse | null) => {
+        onRecordingsLoaded(result);
+        if (!result) {
+          setAllRecordingsLoaded(true);
+        }
+      },
+      lastTimestamp
+    );
+  }, [idToken, lastTimestamp, user?.uid, onRecordingsLoaded]);
 
   useEffect(() => {
-    // Get fresh id token
     if (user && sessionId) {
-      user.getIdToken().then((idToken) => {
-        fetch(
-          `${process.env.NEXT_PUBLIC_DATABASE_URL}/users/${user.uid}/.json?auth=${idToken}&orderBy="sessionId"&equalTo="${sessionId}"`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        )
-          .then((response) => response.json())
-          .then((result: RecordingFirebaseResponse) => {
-            const newRecordings = Object.keys(result).map((recordingKey) => {
-              return {
-                id: recordingKey,
-                ...result[recordingKey],
-              };
-            });
-            setIsLoadingRecordings(false);
-            setRecordings((prev) => {
-              return [...prev, ...newRecordings];
-            });
-          });
+      user.getIdToken().then((newIdToken) => {
+        fetchRecordings(
+          user.uid,
+          newIdToken,
+          sessionId,
+          recordingsLimit,
+          onRecordingsLoaded
+        );
+        setIdToken(newIdToken);
       });
     }
-  }, [user, sessionId]);
+  }, [user, sessionId, onRecordingsLoaded]);
 
-  if (loading || (user && isLoadingRecordings)) {
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      lastId &&
+      scrollPosition > 0 &&
+      !isLoadingRecordings &&
+      !allRecordingsLoaded
+    ) {
+      const lastIdElement = document.getElementById(`recording-step-${lastId}`);
+      if (
+        lastIdElement &&
+        lastIdElement.getBoundingClientRect().bottom <= window.innerHeight
+      ) {
+        loadNewRecordings();
+      }
+    }
+  }, [
+    lastId,
+    scrollPosition,
+    isLoadingRecordings,
+    loadNewRecordings,
+    allRecordingsLoaded,
+  ]);
+
+  if (loading || (user && isLoadingRecordings && recordings.length === 0)) {
     return (
       <Loading
         wrapperClassName="flex flex-col items-center h-[calc(100vh-72px)] justify-center"
@@ -66,18 +169,31 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
     );
   }
 
+  if (!isLoadingRecordings && recordings.length === 0) {
+    return (
+      <div className="pt-20 h-[calc(100vh-72px)] text-center">
+        <span className="text-2xl text-gray-600">
+          Nothing found for this specific session. Please try visiting this page
+          later . . .
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col mb-10">
       {recordings.map((recording, index) => {
         let recordingLink = <></>;
         if (
-          index === 0 ||
-          recordings[index].url !== recordings[index - 1].url
+          (index === 0 ||
+            recordings[index].url !== recordings[index - 1].url) &&
+          recording.url
         ) {
           recordingLink = (
             <div
               className="py-5 px-20 mt-10 w-full bg-white rounded-lg border"
-              key={`recording-${recording.id}`}
+              key={`recording-link-${recording.id}`}
+              id={`recording-link-${recording.id}`}
             >
               <div className="text-lg text-neutral-700">
                 Navigate to{' '}
@@ -94,7 +210,10 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
         }
 
         const recordingStep = (
-          <div className="py-10 px-20 mt-10 w-full bg-white rounded-lg border">
+          <div
+            id={`recording-step-${recording.id}`}
+            className="py-10 px-20 mt-10 w-full bg-white rounded-lg border"
+          >
             <div className="mb-4 text-lg text-neutral-700">
               {recording.clickedElementName}
             </div>
@@ -109,6 +228,9 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
           </React.Fragment>
         );
       })}
+      {recordings.length > 0 && isLoadingRecordings && (
+        <Loading wrapperClassName="flex flex-col items-center justify-center mt-2" />
+      )}
     </div>
   );
 };
