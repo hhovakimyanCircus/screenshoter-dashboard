@@ -1,5 +1,6 @@
 import Head from 'next/head';
 
+import Dashboard from '@/components/Dashboard';
 import Header from '@/components/Header';
 
 export default function Home() {
@@ -15,13 +16,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <main className="h-screen bg-slate-50">
-        <div className="flex flex-col gap-4 items-center px-10 pt-20">
-          <h1 className="text-3xl font-bold text-center">
-            Welcome to My Screenshot dashboard
-          </h1>
-        </div>
-      </main>
+      <Dashboard />
     </>
   );
 }
