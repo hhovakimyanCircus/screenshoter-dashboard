@@ -16,7 +16,7 @@ export default function RecordingSessionPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <main className="px-64 h-full bg-slate-50">
+      <main className="px-64 pb-10 h-full bg-slate-50">
         <Recordings sessionId={sessionId as string} />
       </main>
     </>
