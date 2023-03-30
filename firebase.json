@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/recording/shared/**/**",
+        "destination": "/recording/shared/[userId]/[sessionId].html"
+      },
+      {
         "source": "/recording/**",
         "destination": "/recording/[sessionId].html"
       },
