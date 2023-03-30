@@ -8,21 +8,27 @@ import { Recording, RecordingFirebaseResponse } from '@/types';
 
 type RecordingsProps = {
   sessionId: string;
+  sharerUserId?: string;
+  isGuest?: boolean;
 };
 
 const fetchRecordings = (
   userId: string,
-  token: string,
+  token: string | null,
   sessionId: string,
   limit: number,
   successCallback: (result: RecordingFirebaseResponse | null) => void,
   lastTimestamp?: number
 ) => {
   const queryParams: { [key: string]: string | number } = {
-    auth: token,
     orderBy: '"timestamp"',
     limitToFirst: limit,
   };
+
+  if (token) {
+    queryParams.auth = token;
+  }
+
   if (lastTimestamp) {
     queryParams.startAt = lastTimestamp + 1;
   }
@@ -48,7 +54,11 @@ const fetchRecordings = (
     });
 };
 
-const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
+const Recordings: React.FC<RecordingsProps> = ({
+  sessionId,
+  sharerUserId,
+  isGuest,
+}) => {
   const auth = getAuth();
   const [user, loading] = useAuthState(auth);
 
@@ -85,35 +95,68 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
 
   const loadNewRecordings = useCallback(() => {
     setIsLoadingRecordings(true);
-    fetchRecordings(
-      user?.uid as string,
-      idToken,
-      sessionId,
-      recordingsLimit,
-      (result: RecordingFirebaseResponse | null) => {
-        onRecordingsLoaded(result);
-        if (!result) {
-          setAllRecordingsLoaded(true);
-        }
-      },
-      lastTimestamp
-    );
-  }, [idToken, lastTimestamp, user?.uid, onRecordingsLoaded]);
+    if (isGuest && sharerUserId) {
+      fetchRecordings(
+        sharerUserId,
+        null,
+        sessionId,
+        recordingsLimit,
+        (result: RecordingFirebaseResponse | null) => {
+          onRecordingsLoaded(result);
+          if (!result) {
+            setAllRecordingsLoaded(true);
+          }
+        },
+        lastTimestamp
+      );
+    } else {
+      fetchRecordings(
+        user?.uid as string,
+        idToken,
+        sessionId,
+        recordingsLimit,
+        (result: RecordingFirebaseResponse | null) => {
+          onRecordingsLoaded(result);
+          if (!result) {
+            setAllRecordingsLoaded(true);
+          }
+        },
+        lastTimestamp
+      );
+    }
+  }, [
+    idToken,
+    lastTimestamp,
+    user?.uid,
+    onRecordingsLoaded,
+    sharerUserId,
+    isGuest,
+  ]);
 
   useEffect(() => {
-    if (user && sessionId) {
-      user.getIdToken().then((newIdToken) => {
+    if (sessionId) {
+      if (isGuest && sharerUserId) {
         fetchRecordings(
-          user.uid,
-          newIdToken,
+          sharerUserId,
+          null,
           sessionId,
           recordingsLimit,
           onRecordingsLoaded
         );
-        setIdToken(newIdToken);
-      });
+      } else if (user) {
+        user.getIdToken().then((newIdToken) => {
+          fetchRecordings(
+            user.uid,
+            newIdToken,
+            sessionId,
+            recordingsLimit,
+            onRecordingsLoaded
+          );
+          setIdToken(newIdToken);
+        });
+      }
     }
-  }, [user, sessionId, onRecordingsLoaded]);
+  }, [user, sessionId, onRecordingsLoaded, isGuest, sharerUserId]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -159,7 +202,7 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
     );
   }
 
-  if (!loading && !user) {
+  if (!loading && !user && !isGuest) {
     return (
       <div className="pt-20 h-[calc(100vh-72px)] text-center">
         <span className="text-2xl text-gray-600">
