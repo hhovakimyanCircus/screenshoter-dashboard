@@ -5,54 +5,13 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 import Loading from '@/components/base/Loading';
 import ShareRecordingButton from '@/components/ShareRecordingButton';
+import { fetchRecordings } from '@/firebase';
 import { Recording, RecordingFirebaseResponse } from '@/types';
 
 type RecordingsProps = {
   sessionId: string;
   sharerUserId?: string;
   isGuest?: boolean;
-};
-
-const fetchRecordings = (
-  userId: string,
-  token: string | null,
-  sessionId: string,
-  limit: number,
-  successCallback: (result: RecordingFirebaseResponse | null) => void,
-  lastTimestamp?: number
-) => {
-  const queryParams: { [key: string]: string | number } = {
-    orderBy: '"timestamp"',
-    limitToFirst: limit,
-  };
-
-  if (token) {
-    queryParams.auth = token;
-  }
-
-  if (lastTimestamp) {
-    queryParams.startAt = lastTimestamp + 1;
-  }
-
-  const queryString = Object.keys(queryParams)
-    .map(
-      (k) => `${encodeURIComponent(k)}=${encodeURIComponent(queryParams[k])}`
-    )
-    .join('&');
-
-  fetch(
-    `${process.env.NEXT_PUBLIC_DATABASE_URL}/users/${userId}/${sessionId}/.json?${queryString}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  )
-    .then((response) => response.json())
-    .then((result: RecordingFirebaseResponse | null) => {
-      successCallback(result);
-    });
 };
 
 const Recordings: React.FC<RecordingsProps> = ({
