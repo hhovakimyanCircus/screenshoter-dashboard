@@ -1,6 +1,9 @@
 import { initializeApp } from 'firebase/app';
 
-import { RecordingFirebaseResponse, SessionFirebaseResponse } from '@/types';
+import {
+  RecordingStepsFirebaseResponse,
+  RecordingDetailsFirebaseResponse,
+} from '@/types';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY,
@@ -13,12 +16,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const fetchRecordings = (
+export const fetchRecordingSteps = (
   userId: string,
   token: string | null,
   sessionId: string,
   limit: number,
-  successCallback: (result: RecordingFirebaseResponse | null) => void,
+  successCallback: (result: RecordingStepsFirebaseResponse | null) => void,
   lastTimestamp?: number
 ) => {
   const queryParams: { [key: string]: string | number } = {
@@ -50,15 +53,15 @@ export const fetchRecordings = (
     }
   )
     .then((response) => response.json())
-    .then((result: RecordingFirebaseResponse | null) => {
+    .then((result: RecordingStepsFirebaseResponse | null) => {
       successCallback(result);
     });
 };
 
-export const fetchSessionDetails = (
+export const fetchRecordingDetails = (
   userId: string,
   sessionId: string,
-  successCallback: (result: SessionFirebaseResponse) => void
+  successCallback: (result: RecordingDetailsFirebaseResponse) => void
 ) => {
   fetch(
     `${process.env.NEXT_PUBLIC_DATABASE_URL}/users/${userId}/${sessionId}/details/.json?`,
@@ -70,7 +73,7 @@ export const fetchSessionDetails = (
     }
   )
     .then((response) => response.json())
-    .then((result: SessionFirebaseResponse) => {
+    .then((result: RecordingDetailsFirebaseResponse) => {
       successCallback(result);
     });
 };

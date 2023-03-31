@@ -1,19 +1,21 @@
 import React from 'react';
 
-import { Recording } from '@/types';
+import { RecordingStep } from '@/types';
 
-type RecordingsListProps = {
-  recordings: Recording[];
+type RecordingStepsListProps = {
+  recordingSteps: RecordingStep[];
 };
 
-const RecordingsList: React.FC<RecordingsListProps> = ({ recordings }) => {
+const RecordingStepsList: React.FC<RecordingStepsListProps> = ({
+  recordingSteps,
+}) => {
   return (
     <div>
-      {recordings.map((recording, index) => {
+      {recordingSteps.map((recording, index) => {
         let recordingLink = <></>;
         if (
           (index === 0 ||
-            recordings[index].url !== recordings[index - 1].url) &&
+            recordingSteps[index].url !== recordingSteps[index - 1].url) &&
           recording.url
         ) {
           recordingLink = (
@@ -58,4 +60,4 @@ const RecordingsList: React.FC<RecordingsListProps> = ({ recordings }) => {
   );
 };
 
-export default RecordingsList;
+export default RecordingStepsList;

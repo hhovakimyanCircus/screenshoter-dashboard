@@ -5,80 +5,85 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 import Loading from '@/components/base/Loading';
 import ShareRecordingButton from '@/components/Recordings/ShareRecordingButton';
-import RecordingsList from '@/components/RecordingsList';
-import { fetchRecordings } from '@/firebase';
-import { Recording, RecordingFirebaseResponse } from '@/types';
+import RecordingStepsList from '@/components/RecordingsList';
+import { fetchRecordingSteps } from '@/firebase';
+import { RecordingStep, RecordingStepsFirebaseResponse } from '@/types';
 
-type RecordingsProps = {
-  sessionId: string;
+type RecordingStepsProps = {
+  recordingId: string;
 };
 
-const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
+const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
   const auth = getAuth();
   const [user, loading] = useAuthState(auth);
 
-  const [recordings, setRecordings] = useState<Recording[]>([]);
-  const [isLoadingRecordings, setIsLoadingRecordings] = useState<boolean>(true);
+  const [recordingSteps, setRecordingSteps] = useState<RecordingStep[]>([]);
+  const [isLoadingRecordingSteps, setIsLoadingRecordingSteps] =
+    useState<boolean>(true);
   const [idToken, setIdToken] = useState<string>('');
   const [lastId, setLastId] = useState<string>('');
   const [lastTimestamp, setLastTimestamp] = useState<number>(0);
   const [scrollPosition, setScrollPosition] = useState<number>(0);
-  const [allRecordingsLoaded, setAllRecordingsLoaded] =
+  const [allRecordingStepsLoaded, setAllRecordingStepsLoaded] =
     useState<boolean>(false);
   const recordingsLimit = 2;
 
-  const onRecordingsLoaded = useCallback(
-    (result: RecordingFirebaseResponse | null) => {
+  const onRecordingStepsLoaded = useCallback(
+    (result: RecordingStepsFirebaseResponse | null) => {
       if (result) {
-        const newRecordings = Object.keys(result).map((recordingKey) => {
-          return {
-            id: recordingKey,
-            ...result[recordingKey],
-          };
+        const newRecordingSteps = Object.keys(result).map(
+          (recordingStepKey) => {
+            return {
+              id: recordingStepKey,
+              ...result[recordingStepKey],
+            };
+          }
+        );
+        setRecordingSteps((prev) => {
+          return [...prev, ...newRecordingSteps];
         });
-        setRecordings((prev) => {
-          return [...prev, ...newRecordings];
-        });
-        setLastId(newRecordings[newRecordings.length - 1].id);
-        setLastTimestamp(newRecordings[newRecordings.length - 1].timestamp);
+        setLastId(newRecordingSteps[newRecordingSteps.length - 1].id);
+        setLastTimestamp(
+          newRecordingSteps[newRecordingSteps.length - 1].timestamp
+        );
       }
 
-      setIsLoadingRecordings(false);
+      setIsLoadingRecordingSteps(false);
     },
     []
   );
 
-  const loadNewRecordings = useCallback(() => {
-    setIsLoadingRecordings(true);
-    fetchRecordings(
+  const loadNewRecordingSteps = useCallback(() => {
+    setIsLoadingRecordingSteps(true);
+    fetchRecordingSteps(
       user?.uid as string,
       idToken,
-      sessionId,
+      recordingId,
       recordingsLimit,
-      (result: RecordingFirebaseResponse | null) => {
-        onRecordingsLoaded(result);
+      (result: RecordingStepsFirebaseResponse | null) => {
+        onRecordingStepsLoaded(result);
         if (!result) {
-          setAllRecordingsLoaded(true);
+          setAllRecordingStepsLoaded(true);
         }
       },
       lastTimestamp
     );
-  }, [idToken, lastTimestamp, user?.uid, onRecordingsLoaded]);
+  }, [idToken, lastTimestamp, user?.uid, onRecordingStepsLoaded]);
 
   useEffect(() => {
-    if (sessionId && user) {
+    if (recordingId && user) {
       user.getIdToken().then((newIdToken) => {
-        fetchRecordings(
+        fetchRecordingSteps(
           user.uid,
           newIdToken,
-          sessionId,
+          recordingId,
           recordingsLimit,
-          onRecordingsLoaded
+          onRecordingStepsLoaded
         );
         setIdToken(newIdToken);
       });
     }
-  }, [user, sessionId, onRecordingsLoaded]);
+  }, [user, recordingId, onRecordingStepsLoaded]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -96,26 +101,29 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
     if (
       lastId &&
       scrollPosition > 0 &&
-      !isLoadingRecordings &&
-      !allRecordingsLoaded
+      !isLoadingRecordingSteps &&
+      !allRecordingStepsLoaded
     ) {
       const lastIdElement = document.getElementById(`recording-step-${lastId}`);
       if (
         lastIdElement &&
         lastIdElement.getBoundingClientRect().bottom <= window.innerHeight
       ) {
-        loadNewRecordings();
+        loadNewRecordingSteps();
       }
     }
   }, [
     lastId,
     scrollPosition,
-    isLoadingRecordings,
-    loadNewRecordings,
-    allRecordingsLoaded,
+    isLoadingRecordingSteps,
+    loadNewRecordingSteps,
+    allRecordingStepsLoaded,
   ]);
 
-  if (loading || (user && isLoadingRecordings && recordings.length === 0)) {
+  if (
+    loading ||
+    (user && isLoadingRecordingSteps && recordingSteps.length === 0)
+  ) {
     return (
       <Loading
         wrapperClassName="flex flex-col items-center h-[calc(100vh-72px)] justify-center"
@@ -134,7 +142,7 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
     );
   }
 
-  if (!isLoadingRecordings && recordings.length === 0) {
+  if (!isLoadingRecordingSteps && recordingSteps.length === 0) {
     return (
       <div className="pt-20 h-[calc(100vh-72px)] text-center">
         <span className="text-2xl text-gray-600">
@@ -149,17 +157,17 @@ const Recordings: React.FC<RecordingsProps> = ({ sessionId }) => {
     <div className="flex flex-col mb-10">
       <div className="flex justify-end mt-16">
         <ShareRecordingButton
-          sessionId={sessionId}
+          sessionId={recordingId}
           userId={user?.uid as string}
           idToken={idToken}
         />
       </div>
-      <RecordingsList recordings={recordings} />
-      {recordings.length > 0 && isLoadingRecordings && (
+      <RecordingStepsList recordingSteps={recordingSteps} />
+      {recordingSteps.length > 0 && isLoadingRecordingSteps && (
         <Loading wrapperClassName="flex flex-col items-center justify-center mt-2" />
       )}
     </div>
   );
 };
 
-export default Recordings;
+export default RecordingSteps;

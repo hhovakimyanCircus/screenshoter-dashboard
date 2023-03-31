@@ -1,11 +1,11 @@
-export type FirebaseRecording = {
+export type FirebaseRecordingStep = {
   clickedElementName: string;
   image: string;
   timestamp: number;
   url: string;
 };
 
-export type Recording = {
+export type RecordingStep = {
   clickedElementName: string;
   image: string;
   timestamp: number;
@@ -13,9 +13,11 @@ export type Recording = {
   id: string;
 };
 
-export type RecordingFirebaseResponse = { [key: string]: FirebaseRecording };
+export type RecordingStepsFirebaseResponse = {
+  [key: string]: FirebaseRecordingStep;
+};
 
-export type SessionFirebaseResponse = {
+export type RecordingDetailsFirebaseResponse = {
   sharable?: boolean;
   shareMethod?: string;
 };

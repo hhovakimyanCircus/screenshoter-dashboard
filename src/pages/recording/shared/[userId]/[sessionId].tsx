@@ -18,7 +18,7 @@ export default function SharedRecordingSessionPage() {
       <Header />
       <main className="px-64 pb-10 mt-16 h-full bg-slate-50">
         <SharedRecordings
-          sessionId={sessionId as string}
+          recordingId={sessionId as string}
           sharerUserId={userId as string}
         />
       </main>
