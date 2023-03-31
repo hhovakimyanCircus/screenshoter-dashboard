@@ -9,11 +9,8 @@ type LogoutProps = {
 const Logout: React.FC<LogoutProps> = ({ auth }) => {
   const signOut = useCallback(() => {
     auth.signOut();
-    if (chrome.runtime) {
-      chrome.runtime.sendMessage(process.env.NEXT_PUBLIC_EXTENSION_ID, {
-        event: 'LOGOUT',
-      });
-    }
+    const event = new CustomEvent('MY_SCREENSHOTER_LOGOUT');
+    window.dispatchEvent(event);
   }, [auth]);
 
   return (
