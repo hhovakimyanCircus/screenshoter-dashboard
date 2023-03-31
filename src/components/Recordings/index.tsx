@@ -190,6 +190,7 @@ const Recordings: React.FC<RecordingsProps> = ({
           <ShareRecordingButton
             sessionId={sessionId}
             userId={user?.uid as string}
+            idToken={idToken}
           />
         )}
       </div>
