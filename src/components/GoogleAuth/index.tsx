@@ -1,7 +1,7 @@
 import { getAuth } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-import Loading from '@/components/Loading';
+import Loading from '@/components/base/Loading';
 import Login from '@/components/Login';
 import Logout from '@/components/Logout';
 import initFirebase from '@/firebase';
