@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import Header from '@/components/Header';
-import Recordings from '@/components/Recordings';
+import SharedRecordings from '@/components/SharedRecordings';
 
 export default function SharedRecordingSessionPage() {
   const router = useRouter();
@@ -17,10 +17,9 @@ export default function SharedRecordingSessionPage() {
       </Head>
       <Header />
       <main className="px-64 pb-10 mt-16 h-full bg-slate-50">
-        <Recordings
-          sessionId={sessionId as string}
+        <SharedRecordings
+          recordingId={sessionId as string}
           sharerUserId={userId as string}
-          isGuest={true}
         />
       </main>
     </>
