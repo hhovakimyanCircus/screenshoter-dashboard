@@ -15,12 +15,14 @@ const Login: React.FC<LoginProps> = ({ auth }) => {
     const refreshToken = result?.user?.stsTokenManager?.refreshToken;
     const userId = result?.user?.uid;
 
-    if (chrome.runtime && userId && refreshToken) {
-      chrome.runtime.sendMessage(process.env.NEXT_PUBLIC_EXTENSION_ID, {
-        event: 'LOGIN',
-        userId,
-        refreshToken,
+    if (userId && refreshToken) {
+      const event = new CustomEvent('MY_SCREENSHOTER_LOGIN', {
+        detail: {
+          userId,
+          refreshToken,
+        },
       });
+      window.dispatchEvent(event);
     }
   }, [auth, provider]);
 
