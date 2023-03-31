@@ -44,7 +44,7 @@ export const fetchRecordingSteps = (
     .join('&');
 
   fetch(
-    `${process.env.NEXT_PUBLIC_DATABASE_URL}/users/${userId}/${sessionId}/.json?${queryString}`,
+    `${process.env.NEXT_PUBLIC_DATABASE_URL}/users/${userId}/${sessionId}/steps.json?${queryString}`,
     {
       method: 'GET',
       headers: {
