@@ -14,3 +14,8 @@ export type Recording = {
 };
 
 export type RecordingFirebaseResponse = { [key: string]: FirebaseRecording };
+
+export type SessionFirebaseResponse = {
+  sharable?: boolean;
+  shareMethod?: string;
+};

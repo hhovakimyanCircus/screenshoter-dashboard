@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 
-import { RecordingFirebaseResponse } from '@/types';
+import { RecordingFirebaseResponse, SessionFirebaseResponse } from '@/types';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY,
@@ -55,6 +55,26 @@ export const fetchRecordings = (
     });
 };
 
+export const fetchSessionDetails = (
+  userId: string,
+  sessionId: string,
+  successCallback: (result: SessionFirebaseResponse) => void
+) => {
+  fetch(
+    `${process.env.NEXT_PUBLIC_DATABASE_URL}/users/${userId}/${sessionId}/details/.json?`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+    .then((response) => response.json())
+    .then((result: SessionFirebaseResponse) => {
+      successCallback(result);
+    });
+};
+
 export const updateSession = (
   userId: string,
   token: string,
@@ -83,8 +103,7 @@ export const updateSession = (
     }
   )
     .then((response) => response.json())
-    .then((result) => {
-      console.log(result);
+    .then(() => {
       successCallback();
     });
 };
