@@ -111,6 +111,42 @@ export const updateSession = (
     });
 };
 
+export const updateStep = (
+  userId: string,
+  token: string,
+  sessionId: string,
+  stepId: string,
+  dataToUpdate: Record<string, unknown>,
+  successCallback?: () => void
+) => {
+  const queryParams: { [key: string]: string | number } = {
+    auth: token,
+  };
+
+  const queryString = Object.keys(queryParams)
+    .map(
+      (k) => `${encodeURIComponent(k)}=${encodeURIComponent(queryParams[k])}`
+    )
+    .join('&');
+
+  fetch(
+    `${process.env.NEXT_PUBLIC_DATABASE_URL}/users/${userId}/${sessionId}/steps/${stepId}/.json?${queryString}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToUpdate),
+    }
+  )
+    .then((response) => response.json())
+    .then(() => {
+      if (successCallback) {
+        successCallback();
+      }
+    });
+};
+
 export default function initFirebase() {
   return app;
 }
