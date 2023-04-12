@@ -6,7 +6,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import Loading from '@/components/base/Loading';
 import ShareRecordingButton from '@/components/Recordings/ShareRecordingButton';
 import RecordingStepsList from '@/components/RecordingsList';
-import { fetchRecordingSteps } from '@/firebase';
+import { fetchRecordingSteps, updateStep } from '@/firebase';
 import { RecordingStep, RecordingStepsFirebaseResponse } from '@/types';
 
 type RecordingStepsProps = {
@@ -69,6 +69,19 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
       lastTimestamp
     );
   }, [idToken, lastTimestamp, user?.uid, onRecordingStepsLoaded]);
+
+  const updateStepData = useCallback(
+    (stepId: string, dataToUpdate: Record<string, unknown>) => {
+      updateStep(
+        user?.uid as string,
+        idToken,
+        recordingId,
+        stepId,
+        dataToUpdate
+      );
+    },
+    [idToken, user?.uid, recordingId]
+  );
 
   useEffect(() => {
     if (recordingId && user) {
@@ -162,7 +175,11 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
           idToken={idToken}
         />
       </div>
-      <RecordingStepsList recordingSteps={recordingSteps} />
+      <RecordingStepsList
+        recordingSteps={recordingSteps}
+        owner={true}
+        updateStepData={updateStepData}
+      />
       {recordingSteps.length > 0 && isLoadingRecordingSteps && (
         <Loading wrapperClassName="flex flex-col items-center justify-center mt-2" />
       )}

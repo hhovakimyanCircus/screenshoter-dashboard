@@ -1,14 +1,31 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
+import Step from '@/components/RecordingsList/Step';
 import { RecordingStep } from '@/types';
 
 type RecordingStepsListProps = {
   recordingSteps: RecordingStep[];
+  owner?: boolean;
+  updateStepData?: (
+    stepId: string,
+    dataToUpdate: Record<string, unknown>
+  ) => void;
 };
 
 const RecordingStepsList: React.FC<RecordingStepsListProps> = ({
   recordingSteps,
+  owner = false,
+  updateStepData,
 }) => {
+  const updateStepClickedElementName = useCallback(
+    (stepId: string, newElementName: string) => {
+      if (updateStepData) {
+        updateStepData(stepId, { clickedElementName: newElementName });
+      }
+    },
+    [updateStepData]
+  );
+
   return (
     <div>
       {recordingSteps.map((recording, index) => {
@@ -37,22 +54,14 @@ const RecordingStepsList: React.FC<RecordingStepsListProps> = ({
           );
         }
 
-        const recordingStep = (
-          <div
-            id={`recording-step-${recording.id}`}
-            className="py-10 px-20 mt-10 w-full bg-white rounded-lg border"
-          >
-            <div className="mb-4 text-lg text-neutral-700">
-              {recording.clickedElementName}
-            </div>
-            <img src={recording.image} alt="" className="w-full" />
-          </div>
-        );
-
         return (
           <React.Fragment key={`recording-${recording.id}`}>
             {recordingLink}
-            {recordingStep}
+            <Step
+              step={recording}
+              owner={owner}
+              updateData={updateStepClickedElementName}
+            />
           </React.Fragment>
         );
       })}
