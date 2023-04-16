@@ -10,12 +10,14 @@ type RecordingStepsListProps = {
     stepId: string,
     dataToUpdate: Record<string, unknown>
   ) => void;
+  deleteStepData?: (stepId: string) => void;
 };
 
 const RecordingStepsList: React.FC<RecordingStepsListProps> = ({
   recordingSteps,
   owner = false,
   updateStepData,
+  deleteStepData,
 }) => {
   const updateStepClickedElementName = useCallback(
     (stepId: string, newElementName: string) => {
@@ -24,6 +26,15 @@ const RecordingStepsList: React.FC<RecordingStepsListProps> = ({
       }
     },
     [updateStepData]
+  );
+
+  const deleteStep = useCallback(
+    (stepId: string) => {
+      if (deleteStepData) {
+        deleteStepData(stepId);
+      }
+    },
+    [deleteStepData]
   );
 
   return (
@@ -61,6 +72,7 @@ const RecordingStepsList: React.FC<RecordingStepsListProps> = ({
               step={recording}
               owner={owner}
               updateData={updateStepClickedElementName}
+              deleteStep={deleteStep}
             />
           </React.Fragment>
         );

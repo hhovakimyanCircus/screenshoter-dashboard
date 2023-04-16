@@ -147,6 +147,40 @@ export const updateStep = (
     });
 };
 
+export const deleteStep = (
+  userId: string,
+  token: string,
+  sessionId: string,
+  stepId: string,
+  successCallback?: () => void
+) => {
+  const queryParams: { [key: string]: string | number } = {
+    auth: token,
+  };
+
+  const queryString = Object.keys(queryParams)
+    .map(
+      (k) => `${encodeURIComponent(k)}=${encodeURIComponent(queryParams[k])}`
+    )
+    .join('&');
+
+  fetch(
+    `${process.env.NEXT_PUBLIC_DATABASE_URL}/users/${userId}/${sessionId}/steps/${stepId}/.json?${queryString}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+    .then((response) => response.json())
+    .then(() => {
+      if (successCallback) {
+        successCallback();
+      }
+    });
+};
+
 export default function initFirebase() {
   return app;
 }
