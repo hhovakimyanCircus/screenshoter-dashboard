@@ -6,7 +6,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import Loading from '@/components/base/Loading';
 import ShareRecordingButton from '@/components/Recordings/ShareRecordingButton';
 import RecordingStepsList from '@/components/RecordingsList';
-import { fetchRecordingSteps, updateStep } from '@/firebase';
+import { fetchRecordingSteps, updateStep, deleteStep } from '@/firebase';
 import { RecordingStep, RecordingStepsFirebaseResponse } from '@/types';
 
 type RecordingStepsProps = {
@@ -81,6 +81,18 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
       );
     },
     [idToken, user?.uid, recordingId]
+  );
+
+  const deleteStepData = useCallback(
+    (stepId: string) => {
+      deleteStep(user?.uid as string, idToken, recordingId, stepId, () => {
+        const newRecordingSteps = recordingSteps.filter(
+          (recordingStep) => recordingStep.id !== stepId
+        );
+        setRecordingSteps(newRecordingSteps);
+      });
+    },
+    [idToken, user?.uid, recordingId, recordingSteps]
   );
 
   useEffect(() => {
@@ -179,6 +191,7 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
         recordingSteps={recordingSteps}
         owner={true}
         updateStepData={updateStepData}
+        deleteStepData={deleteStepData}
       />
       {recordingSteps.length > 0 && isLoadingRecordingSteps && (
         <Loading wrapperClassName="flex flex-col items-center justify-center mt-2" />

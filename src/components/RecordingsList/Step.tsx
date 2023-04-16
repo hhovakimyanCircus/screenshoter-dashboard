@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
 import CheckIcon from '@/components/base/icons/Check';
+import DeleteIcon from '@/components/base/icons/Delete';
 import EditIcon from '@/components/base/icons/Edit';
 import { RecordingStep } from '@/types';
 
@@ -8,9 +9,10 @@ type StepProps = {
   step: RecordingStep;
   owner: boolean;
   updateData: (stepId: string, newElementName: string) => void;
+  deleteStep: (stepId: string) => void;
 };
 
-const Step: React.FC<StepProps> = ({ step, owner, updateData }) => {
+const Step: React.FC<StepProps> = ({ step, owner, updateData, deleteStep }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>(step.clickedElementName);
 
@@ -49,7 +51,7 @@ const Step: React.FC<StepProps> = ({ step, owner, updateData }) => {
               {inputValue ? `Clicked: ${inputValue}` : 'Clicked here'}
             </div>
             {owner && (
-              <div className="flex">
+              <div className="flex" style={{ gap: '10px' }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -58,6 +60,15 @@ const Step: React.FC<StepProps> = ({ step, owner, updateData }) => {
                   title="Edit clicked element name"
                 >
                   <EditIcon width={20} height={20} stroke="#FF5C77" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    deleteStep(step.id);
+                  }}
+                  title="Delete step"
+                >
+                  <DeleteIcon width={20} height={20} stroke="#FF5C77" />
                 </button>
               </div>
             )}
