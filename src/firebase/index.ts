@@ -83,7 +83,7 @@ export const updateSession = (
   token: string,
   sessionId: string,
   dataToUpdate: Record<string, unknown>,
-  successCallback: () => void
+  successCallback?: () => void
 ) => {
   const queryParams: { [key: string]: string | number } = {
     auth: token,
@@ -107,7 +107,9 @@ export const updateSession = (
   )
     .then((response) => response.json())
     .then(() => {
-      successCallback();
+      if (successCallback) {
+        successCallback();
+      }
     });
 };
 

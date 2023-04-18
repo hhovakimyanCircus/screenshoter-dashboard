@@ -4,20 +4,34 @@ import { getAuth } from '@firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import Loading from '@/components/base/Loading';
+import RecordingName from '@/components/Recordings/RecordingName';
 import ShareRecordingButton from '@/components/Recordings/ShareRecordingButton';
 import RecordingStepsList from '@/components/RecordingsList';
-import { fetchRecordingSteps, updateStep, deleteStep } from '@/firebase';
-import { RecordingStep, RecordingStepsFirebaseResponse } from '@/types';
+import {
+  fetchRecordingSteps,
+  updateStep,
+  deleteStep,
+  fetchRecordingDetails,
+} from '@/firebase';
+import {
+  RecordingDetailsFirebaseResponse,
+  RecordingStep,
+  RecordingStepsFirebaseResponse,
+} from '@/types';
 
 type RecordingStepsProps = {
   recordingId: string;
 };
+
+const recordingsLimit = 2;
 
 const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
   const auth = getAuth();
   const [user, loading] = useAuthState(auth);
 
   const [recordingSteps, setRecordingSteps] = useState<RecordingStep[]>([]);
+  const [recordingDetails, setRecordingDetails] =
+    useState<RecordingDetailsFirebaseResponse>({});
   const [isLoadingRecordingSteps, setIsLoadingRecordingSteps] =
     useState<boolean>(true);
   const [idToken, setIdToken] = useState<string>('');
@@ -26,7 +40,8 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
   const [scrollPosition, setScrollPosition] = useState<number>(0);
   const [allRecordingStepsLoaded, setAllRecordingStepsLoaded] =
     useState<boolean>(false);
-  const recordingsLimit = 2;
+  const [isLoadingRecordingDetails, setIsLoadingRecordingDetails] =
+    useState<boolean>(true);
 
   const onRecordingStepsLoaded = useCallback(
     (result: RecordingStepsFirebaseResponse | null) => {
@@ -145,9 +160,21 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
     allRecordingStepsLoaded,
   ]);
 
+  useEffect(() => {
+    if (user?.uid && recordingId) {
+      fetchRecordingDetails(user.uid, recordingId, (result) => {
+        setIsLoadingRecordingDetails(false);
+        if (result) {
+          setRecordingDetails(result);
+        }
+      });
+    }
+  }, [user?.uid, recordingId]);
+
   if (
     loading ||
-    (user && isLoadingRecordingSteps && recordingSteps.length === 0)
+    (user && isLoadingRecordingSteps && recordingSteps.length === 0) ||
+    (user && isLoadingRecordingDetails)
   ) {
     return (
       <Loading
@@ -180,7 +207,13 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
 
   return (
     <div className="flex flex-col mb-10">
-      <div className="flex justify-end mt-16">
+      <div className="flex justify-between items-center mt-16">
+        <RecordingName
+          sessionId={recordingId}
+          userId={user?.uid as string}
+          idToken={idToken}
+          currentName={recordingDetails?.name || ''}
+        />
         <ShareRecordingButton
           sessionId={recordingId}
           userId={user?.uid as string}
