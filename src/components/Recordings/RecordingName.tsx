@@ -2,12 +2,30 @@ import React, { useCallback, useState } from 'react';
 
 import CheckIcon from '@/components/base/icons/Check';
 import EditIcon from '@/components/base/icons/Edit';
+import { updateSession } from '@/firebase';
 
-const RecordingName = () => {
+type RecordingNameProps = {
+  sessionId: string;
+  userId: string;
+  idToken: string;
+  currentName: string;
+};
+
+const RecordingName: React.FC<RecordingNameProps> = ({
+  sessionId,
+  userId,
+  idToken,
+  currentName,
+}) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>(currentName);
 
-  const updateRecordingName = useCallback(() => {}, []);
+  const updateRecordingName = useCallback(() => {
+    setIsEditing(false);
+    updateSession(userId, idToken, sessionId, {
+      name: inputValue,
+    });
+  }, [userId, idToken, sessionId, inputValue]);
 
   return isEditing ? (
     <div className="relative">

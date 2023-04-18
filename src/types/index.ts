@@ -20,4 +20,5 @@ export type RecordingStepsFirebaseResponse = {
 export type RecordingDetailsFirebaseResponse = {
   sharable?: boolean;
   shareMethod?: string;
+  name?: string;
 };
