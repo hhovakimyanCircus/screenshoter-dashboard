@@ -36,6 +36,10 @@ const Step: React.FC<StepProps> = ({ step, owner, updateData, deleteStep }) => {
               }}
               className="py-3 px-3 w-full rounded-md border border-[#74737A]"
               placeholder="Type new name for clicked element"
+              onBlur={() => {
+                setIsEditing(false);
+              }}
+              autoFocus={true}
             />
             <button
               type="button"
