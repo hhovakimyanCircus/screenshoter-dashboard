@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { createPortal } from 'react-dom';
+
 import Loading from '@/components/base/Loading';
 import RecordingName from '@/components/Recordings/RecordingName';
+import ShareRecordingButton from '@/components/Recordings/ShareRecordingButton';
 import RecordingStepsList from '@/components/RecordingsList';
 import {
   fetchRecordingSteps,
@@ -205,6 +208,14 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({
           idToken={idToken}
           currentName={recordingDetails?.name || ''}
         />
+        {createPortal(
+          <ShareRecordingButton
+            sessionId={recordingId}
+            userId={userId as string}
+            idToken={idToken}
+          />,
+          document.getElementById('share_recording_btn') as Element
+        )}
       </div>
       <RecordingStepsList
         recordingSteps={recordingSteps}
