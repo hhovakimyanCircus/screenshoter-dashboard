@@ -37,6 +37,10 @@ const RecordingName: React.FC<RecordingNameProps> = ({
         }}
         className="text-2xl font-bold text-[#74737A]"
         placeholder="Type recording name"
+        onBlur={() => {
+          setIsEditing(false);
+        }}
+        autoFocus={true}
       />
       <button
         type="button"
