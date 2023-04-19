@@ -15,7 +15,7 @@ export default function RecordingSessionPage() {
   const [idToken, setIdToken] = useState<string>('');
 
   const auth = getAuth();
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
 
   useEffect(() => {
     if (user) {
@@ -38,7 +38,12 @@ export default function RecordingSessionPage() {
         idToken={idToken}
       />
       <main className="px-64 pb-10 mt-16 h-full bg-slate-50">
-        <RecordingSteps recordingId={sessionId as string} />
+        <RecordingSteps
+          recordingId={sessionId as string}
+          userId={user?.uid}
+          idToken={idToken}
+          isAuthInfoLoading={loading}
+        />
       </main>
     </>
   );
