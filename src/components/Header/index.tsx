@@ -1,8 +1,20 @@
+import React from 'react';
+
+import classNames from 'classnames';
 import Link from 'next/link';
 
 import GoogleAuth from '@/components/GoogleAuth';
+import ShareRecordingButton from '@/components/Recordings/ShareRecordingButton';
 
-const Header = () => {
+type HeaderProps = {
+  sessionId?: string;
+  userId?: string;
+  idToken?: string;
+};
+
+const Header: React.FC<HeaderProps> = ({ sessionId, userId, idToken }) => {
+  const showShareRecordingBtn = sessionId && userId && idToken;
+
   return (
     <header className="fixed top-0 z-30 py-4 px-6 w-screen bg-white border-b">
       <div className="flex justify-between items-center px-4">
@@ -11,7 +23,18 @@ const Header = () => {
             My ScreenShot
           </Link>
         </div>
-        <GoogleAuth />
+        <div
+          className={classNames('flex', showShareRecordingBtn ? 'gap-3.5' : '')}
+        >
+          {showShareRecordingBtn && (
+            <ShareRecordingButton
+              sessionId={sessionId}
+              userId={userId}
+              idToken={idToken}
+            />
+          )}
+          <GoogleAuth />
+        </div>
       </div>
     </header>
   );

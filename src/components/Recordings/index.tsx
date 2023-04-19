@@ -5,7 +5,6 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 import Loading from '@/components/base/Loading';
 import RecordingName from '@/components/Recordings/RecordingName';
-import ShareRecordingButton from '@/components/Recordings/ShareRecordingButton';
 import RecordingStepsList from '@/components/RecordingsList';
 import {
   fetchRecordingSteps,
@@ -207,17 +206,12 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({ recordingId }) => {
 
   return (
     <div className="flex flex-col mb-10">
-      <div className="flex justify-between items-center mt-16">
+      <div className="flex items-center mt-16">
         <RecordingName
           sessionId={recordingId}
           userId={user?.uid as string}
           idToken={idToken}
           currentName={recordingDetails?.name || ''}
-        />
-        <ShareRecordingButton
-          sessionId={recordingId}
-          userId={user?.uid as string}
-          idToken={idToken}
         />
       </div>
       <RecordingStepsList

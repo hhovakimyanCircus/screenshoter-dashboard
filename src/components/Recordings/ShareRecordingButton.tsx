@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 
-import { Button, Tooltip } from 'flowbite-react';
+import { Tooltip } from 'flowbite-react';
 
 import { updateSession } from '@/firebase';
 
@@ -34,9 +34,12 @@ const ShareRecordingButton: React.FC<ShareRecordingButtonProps> = ({
 
   return (
     <Tooltip content="URL copied to clipboard" trigger="click">
-      <Button color="success" onClick={buildRecordingShareLink}>
-        Get Sharable Link
-      </Button>
+      <a
+        className="flex justify-center p-2 w-28 text-lg font-bold text-center text-white bg-[#FF5C77] rounded-lg cursor-pointer"
+        onClick={buildRecordingShareLink}
+      >
+        Share
+      </a>
     </Tooltip>
   );
 };
