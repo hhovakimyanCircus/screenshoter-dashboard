@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import Link from 'next/link';
 
 import GoogleAuth from '@/components/GoogleAuth';
-import ShareRecordingButton from '@/components/Recordings/ShareRecordingButton';
 
 type HeaderProps = {
   sessionId?: string;
@@ -26,13 +25,7 @@ const Header: React.FC<HeaderProps> = ({ sessionId, userId, idToken }) => {
         <div
           className={classNames('flex', showShareRecordingBtn ? 'gap-3.5' : '')}
         >
-          {showShareRecordingBtn && (
-            <ShareRecordingButton
-              sessionId={sessionId}
-              userId={userId}
-              idToken={idToken}
-            />
-          )}
+          <div id="share_recording_btn"></div>
           <GoogleAuth />
         </div>
       </div>
