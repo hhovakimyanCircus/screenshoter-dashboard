@@ -14,12 +14,14 @@ const Login: React.FC<LoginProps> = ({ auth }) => {
     // @ts-ignore
     const refreshToken = result?.user?.stsTokenManager?.refreshToken;
     const userId = result?.user?.uid;
+    const userName = result?.user?.displayName || '';
 
     if (userId && refreshToken) {
       const event = new CustomEvent('MY_SCREENSHOTER_LOGIN', {
         detail: {
           userId,
           refreshToken,
+          userName,
         },
       });
       window.dispatchEvent(event);
