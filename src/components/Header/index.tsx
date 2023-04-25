@@ -1,6 +1,5 @@
 import React from 'react';
 
-import classNames from 'classnames';
 import Link from 'next/link';
 
 import GoogleAuth from '@/components/GoogleAuth';
@@ -22,11 +21,9 @@ const Header: React.FC<HeaderProps> = ({ sessionId, userId, idToken }) => {
             My ScreenShot
           </Link>
         </div>
-        <div
-          className={classNames('flex', showShareRecordingBtn ? 'gap-3.5' : '')}
-        >
-          <div id="share_recording_btn"></div>
-          <GoogleAuth />
+        <div className="flex">
+          {showShareRecordingBtn && <div id="share_recording_btn"></div>}
+          {!showShareRecordingBtn && <GoogleAuth />}
         </div>
       </div>
     </header>

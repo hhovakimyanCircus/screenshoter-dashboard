@@ -15,7 +15,7 @@ export default function SharedRecordingSessionPage() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header sessionId={sessionId as string} />
       <main className="px-64 pb-10 mt-16 h-full bg-slate-50">
         <SharedRecordings
           recordingId={sessionId as string}
