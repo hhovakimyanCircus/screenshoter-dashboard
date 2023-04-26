@@ -4,7 +4,9 @@ import { createPortal } from 'react-dom';
 
 import Loading from '@/components/base/Loading';
 import RecordingName from '@/components/Recordings/RecordingName';
+import RecordingSharedToast from '@/components/Recordings/RecordingSharedToast';
 import ShareRecordingButton from '@/components/Recordings/ShareRecordingButton';
+import ShareRecordingModal from '@/components/Recordings/ShareRecordingModal';
 import RecordingStepsList from '@/components/RecordingsList';
 import {
   fetchRecordingSteps,
@@ -45,6 +47,10 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({
     useState<boolean>(false);
   const [isLoadingRecordingDetails, setIsLoadingRecordingDetails] =
     useState<boolean>(true);
+  const [showShareRecordingModal, setShowShareRecordingModal] =
+    useState<boolean>(false);
+  const [showRecordingSharedToast, setShowRecordingSharedToast] =
+    useState<boolean>(false);
 
   const onRecordingStepsLoaded = useCallback(
     (result: RecordingStepsFirebaseResponse | null) => {
@@ -165,6 +171,21 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({
     }
   }, [userId, recordingId]);
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (showRecordingSharedToast) {
+      timer = setTimeout(() => {
+        setShowRecordingSharedToast(false);
+      }, 1000);
+    }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [showRecordingSharedToast]);
+
   if (
     isAuthInfoLoading ||
     (userId && isLoadingRecordingSteps && recordingSteps.length === 0) ||
@@ -213,6 +234,9 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({
             sessionId={recordingId}
             userId={userId as string}
             idToken={idToken}
+            openShareRecordingModal={() => {
+              setShowShareRecordingModal(true);
+            }}
           />,
           document.getElementById('share_recording_btn') as Element
         )}
@@ -226,6 +250,19 @@ const RecordingSteps: React.FC<RecordingStepsProps> = ({
       {recordingSteps.length > 0 && isLoadingRecordingSteps && (
         <Loading wrapperClassName="flex flex-col items-center justify-center mt-2" />
       )}
+      <ShareRecordingModal
+        show={showShareRecordingModal}
+        recordingName={recordingDetails?.name || ''}
+        url={`https://screenshoter-dfcd1.web.app/recording/shared/${userId}/${recordingId}`}
+        onClose={() => {
+          setShowShareRecordingModal(false);
+        }}
+        onSubmit={() => {
+          setShowShareRecordingModal(false);
+          setShowRecordingSharedToast(true);
+        }}
+      />
+      {showRecordingSharedToast && <RecordingSharedToast />}
     </div>
   );
 };
