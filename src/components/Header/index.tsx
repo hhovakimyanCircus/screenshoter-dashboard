@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ sessionId, userId, idToken }) => {
         </div>
         <div className="flex">
           {showShareRecordingBtn && <div id="share_recording_btn"></div>}
-          {!showShareRecordingBtn && <GoogleAuth />}
+          {!sessionId && <GoogleAuth />}
         </div>
       </div>
     </header>
