@@ -1,18 +1,13 @@
 import React from 'react';
 
+import { UserProfile } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 
-import GoogleAuth from '@/components/GoogleAuth';
-
 type HeaderProps = {
-  sessionId?: string;
-  userId?: string;
-  idToken?: string;
+  user: UserProfile | undefined;
 };
 
-const Header: React.FC<HeaderProps> = ({ sessionId, userId, idToken }) => {
-  const showShareRecordingBtn = sessionId && userId && idToken;
-
+const Header: React.FC<HeaderProps> = ({ user }) => {
   return (
     <header className="fixed top-0 z-30 py-4 px-6 w-screen bg-white border-b">
       <div className="flex justify-between items-center px-4">
@@ -21,10 +16,11 @@ const Header: React.FC<HeaderProps> = ({ sessionId, userId, idToken }) => {
             My ScreenShot
           </Link>
         </div>
-        <div className="flex">
-          {showShareRecordingBtn && <div id="share_recording_btn"></div>}
-          {!sessionId && <GoogleAuth />}
-        </div>
+        {user ? (
+          <Link href="/api/auth/logout">Log Out</Link>
+        ) : (
+          <Link href="/api/auth/login">Log In</Link>
+        )}
       </div>
     </header>
   );
