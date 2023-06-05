@@ -12,7 +12,7 @@ try {
     databaseURL: process.env.NEXT_PUBLIC_DATABASE_URL,
   });
 } catch (error) {
-  console.error('Firebase admin initialization error', error?.stack);
+  console.error('Firebase admin initialization error', error);
 }
 
 export default admin;
